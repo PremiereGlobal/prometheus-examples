@@ -1,0 +1,65 @@
+plugins {
+  id 'java'
+  id 'com.github.johnrengelman.shadow' version '2.0.4'
+  id 'application'
+  id 'maven'
+  id 'eclipse'
+}
+
+mainClassName = 'net.pgicloud.prometheus.example.Main'
+
+repositories {
+  mavenCentral()
+  maven {
+    url "http://oss.sonatype.org/content/groups/public/"
+  }
+}
+
+project.archivesBaseName=''
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+  testCompile('junit:junit:4.12')
+
+  compile (
+    "org.eclipse.jetty:jetty-server:9.0.2.v20130417",
+    "org.eclipse.jetty:jetty-servlet:9.0.2.v20130417",
+    "io.prometheus:simpleclient_hotspot:0.6.0",
+    "io.prometheus:simpleclient_servlet:0.6.0",
+    "io.prometheus:simpleclient_jetty:0.6.0",
+    "com.google.code.gson:gson:2.8.5",
+    "org.slf4j:slf4j-api:1.7.21",
+    "org.slf4j:slf4j-simple:1.7.21",
+    "org.threadly:threadly:5.29",
+    "org.threadly:litesockets-http-server:0.22",
+    "org.threadly:litesockets:4.9"
+  )
+}
+
+test {
+  maxParallelForks = Math.max(1, (int)(Runtime.getRuntime().availableProcessors() / 4))
+}
+
+javadoc {
+  source = sourceSets.main.allJava
+  options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PUBLIC
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+  from sourceSets.main.allSource
+  classifier = 'sources'
+}
+
+jar {
+    baseName "PromExampleServer"
+}
+shadowJar {
+  archiveName "PromExampleServer-${version}-all.jar"
+}
